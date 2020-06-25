@@ -3,9 +3,13 @@
 
 #include "Arduino.h"
 
+/* I2C Address */
 #define CONTROLLER_ADDRESS 0x1
+
+/* Serial Baudrate */
 #define BAUDRATE 115200
 
+/* Assorted Min and Max Values */
 #define VALUE_MIN -100
 #define VALUE_MAX 100
 #define DRIVER_MAX 400
@@ -18,7 +22,6 @@
 #define BRAKE_BIT 4
 #define MIXED_BIT 3
 #define TOGGLE_STATE_BIT 2
-
 
 /* Command Bits */
 #define CHANNEL_1 B10000000
