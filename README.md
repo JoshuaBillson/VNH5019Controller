@@ -15,13 +15,35 @@ for the firmware running on the Uno Controller and must be installed to you Ardu
 folder.
 
 
+## Audio-Visual Feedback And Wiring
+
+LED and Audio feedback denoting the state of the controller has been included in the firmware. When
+the controller first powers up, a start-up chime will play and an LED will light up. Whilst the controller
+is in standby, the LED will blink at regular 2 second intervals and will be solid when the controller
+is active. Additionally, a unique chime will play when the controller enters a standby state and when
+it enters an active state. Please refer to "VNH5019_Controller_Schematic.pdf" for wiring information.
+
+
 ## Usage
 
 To use this project, download the repository and save it to your Arduino/libraries folder. The firmware
-to be uploaded to the Arduino Uno paired with a Dual VNH5019 Motor Driver Shield is contained within
-Firmware/Firmware.ino. To interface with the motor controller over either serial or I2C from an external
-Arduino compatible board, use the VNH5019_Controller class and associated methods by including "VNH5019Controller.h".
-An example sketch has been provided in Example/Example.ino.
+to be uploaded to the Arduino Uno / VNH5019 Motor Driver Shield is contained within Firmware/Firmware.ino.
+To interface with the motor controller over either serial or I2C from an external device, use the
+VNH5019_Controller class and associated methods.
+
+
+## Arduino
+
+To interface with the motor controller from an Arduino compatible board, use the Arduino/VNH5019Controller
+library. An example sketch has been provided in ArduinoExample/ArduinoExample.ino.
+
+
+## Raspberry Pi / NVIDIA Jetson
+
+To interface with the motor controller from a Raspberry Pi or NVIDIA Jetson, use the Python/VNH5019Controller
+library. You can use both I2C and Serial, however USB serial is likely the simplest option as it allows
+you to provide both power and communication to the controller over a single wire. An example sketch has
+been provided in PythonExample/PythonExample.py.
 
 
 ## Classes
