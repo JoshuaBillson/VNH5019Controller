@@ -47,6 +47,10 @@ value: The Value We Want To Write From -100 to 100
 Returns: Nothing
 
 
+
+
+
+
 **writeBrake(mode, channel, value)**\
 Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels
 
