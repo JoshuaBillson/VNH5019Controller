@@ -10,8 +10,8 @@ or Software Serial requires modification to VNH5019Controller.cpp.
 
 ## Dependencies
 
-This project makes use of the [DualVNH5019MotorShield](https://github.com/pololu/dual-vnh5019-motor-shield)
-library for the firmware running on the Uno Controller and must be installed to you Arduino/libraries
+This project makes use of the [DualVNH5019MotorShield library](https://github.com/pololu/dual-vnh5019-motor-shield)
+for the firmware running on the Uno Controller and must be installed to you Arduino/libraries
 folder.
 
 
@@ -45,10 +45,6 @@ channel: The Channel Whose Speed We Want To Set (ONE, TWO, or BOTH)\
 value: The Value We Want To Write From -100 to 100
 
 Returns: Nothing
-
-
-
-
 
 
 **writeBrake(mode, channel, value)**\
