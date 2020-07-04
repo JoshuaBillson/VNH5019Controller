@@ -21,36 +21,54 @@ Takes No Arguments And Returns Nothing
 
 
 **writeSpeed(mode, channel, value)**\
-Write A Speed From -100 (full reverse) to 100 (full forward) To One Or Both Channels\
-writeMode: The Method Of Communication, Either I2C or SRL\
+Write A Speed From -100 (full reverse) to 100 (full forward) To One Or Both Channels
+
+
+mode: The Method Of Communication, Either I2C or SRL\
 channel: The Channel Whose Speed We Want To Set (ONE, TWO, or BOTH)\
 value: The Value We Want To Write
+Returns: Nothing
 
 
 **writeBrake(mode, channel, value)**\
-Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels\
-writeMode: The Method Of Communication, Either I2C or SRL\
+Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels
+
+
+mode: The Method Of Communication, Either I2C or SRL\
 channel: The Channel Whose Brakes We Want To Set (ONE, TWO, or BOTH)\
 value: The Value We Want To Write
+Returns: Nothing
 
 
 **writeMixedCommand(mode, speedVal, turnVal)**\
-Write A Mixed Command\
-writeMode: The Method Of Communication, Either I2C or SRL\
+Write A Mixed Command
+
+
+mode: The Method Of Communication, Either I2C or SRL\
 speedVal: A Value From -100 (Full Reverse) To 100 (Full Forward)\
 turnVal: A Value From -100 (Full Left) To 100 (Full Right)
+Returns: Nothing
 
 
 **stop(mode)**\
-Stop Both Motors By Applying Maximum Braking\
-writeMode: The Method Of Communication, Either I2C or SRL
+Stop Both Motors By Applying Maximum Braking
+
+
+mode: The Method Of Communication, Either I2C or SRL
+Returns: Nothing
 
 
 **setActive(mode)**\
-Place The Controller Into An Active State\
-writeMode: The Method Of Communication, Either I2C or SRL
+Place The Controller Into An Active State
+
+
+mode: The Method Of Communication, Either I2C or SRL
+Returns: Nothing
 
 
 **setStandby(mode)**\
-Place The Controller Into Standby\
-writeMode: The Method Of Communication, Either I2C or SRL
+Place The Controller Into Standby
+
+
+mode: The Method Of Communication, Either I2C or SRL
+Returns: Nothing
