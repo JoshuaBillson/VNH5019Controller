@@ -14,7 +14,9 @@ Shield](https://www.pololu.com/product/2507) coupled with an Arduino Uno.
 ## VNH5019_Controller Methods
 
 **mount()**\
-Open I2C and Serial Ports For Writing To The Controller; Called In setup()\
+Open I2C and Serial Ports For Writing To The Controller; Called In setup()
+
+
 Takes No Arguments And Returns Nothing
 
 
