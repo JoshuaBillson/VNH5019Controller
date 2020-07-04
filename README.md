@@ -31,13 +31,13 @@ An example sketch has been provided in Example/Example.ino.
 
 ## VNH5019_Controller Methods
 
-### **mount()**
+**mount()**\
 Open I2C and Serial Ports For Writing To The Controller; Called In setup()
 
 Takes No Arguments And Returns Nothing
 
 
-### writeSpeed(mode, channel, value)
+**writeSpeed(mode, channel, value)**\
 Write A Speed From -100 (full reverse) to 100 (full forward) To One Or Both Channels
 
 mode: The Method Of Communication, Either I2C or SRL\
@@ -47,7 +47,7 @@ value: The Value We Want To Write From -100 to 100
 Returns: Nothing
 
 
-### writeBrake(mode, channel, value)
+**writeBrake(mode, channel, value)**\
 Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels
 
 mode: The Method Of Communication, Either I2C or SRL\
@@ -57,7 +57,7 @@ value: The Value We Want To Write From 0 to 100
 Returns: Nothing
 
 
-### writeMixedCommand(mode, speedVal, turnVal)
+**writeMixedCommand(mode, speedVal, turnVal)**\
 Write A Mixed Command
 
 mode: The Method Of Communication, Either I2C or SRL\
@@ -67,7 +67,7 @@ turnVal: A Value From -100 (Full Left) To 100 (Full Right)
 Returns: Nothing
 
 
-### stop(mode)
+**stop(mode)**\
 Stop Both Motors By Applying Maximum Braking
 
 mode: The Method Of Communication, Either I2C or SRL
@@ -75,7 +75,7 @@ mode: The Method Of Communication, Either I2C or SRL
 Returns: Nothing
 
 
-### setActive(mode)
+**setActive(mode)**\
 Place The Controller Into An Active State
 
 mode: The Method Of Communication, Either I2C or SRL
@@ -83,7 +83,7 @@ mode: The Method Of Communication, Either I2C or SRL
 Returns: Nothing
 
 
-### setStandby(mode)
+**setStandby(mode)**\
 Place The Controller Into Standby
 
 mode: The Method Of Communication, Either I2C or SRL
