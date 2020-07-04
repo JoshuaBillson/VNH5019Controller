@@ -26,7 +26,7 @@ Write A Speed From -100 (full reverse) to 100 (full forward) To One Or Both Chan
 
 mode: The Method Of Communication, Either I2C or SRL\
 channel: The Channel Whose Speed We Want To Set (ONE, TWO, or BOTH)\
-value: The Value We Want To Write
+value: The Value We Want To Write\
 Returns: Nothing
 
 
@@ -36,7 +36,7 @@ Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels
 
 mode: The Method Of Communication, Either I2C or SRL\
 channel: The Channel Whose Brakes We Want To Set (ONE, TWO, or BOTH)\
-value: The Value We Want To Write
+value: The Value We Want To Write\
 Returns: Nothing
 
 
@@ -46,7 +46,7 @@ Write A Mixed Command
 
 mode: The Method Of Communication, Either I2C or SRL\
 speedVal: A Value From -100 (Full Reverse) To 100 (Full Forward)\
-turnVal: A Value From -100 (Full Left) To 100 (Full Right)
+turnVal: A Value From -100 (Full Left) To 100 (Full Right)\
 Returns: Nothing
 
 
@@ -54,7 +54,7 @@ Returns: Nothing
 Stop Both Motors By Applying Maximum Braking
 
 
-mode: The Method Of Communication, Either I2C or SRL
+mode: The Method Of Communication, Either I2C or SRL\
 Returns: Nothing
 
 
@@ -62,7 +62,7 @@ Returns: Nothing
 Place The Controller Into An Active State
 
 
-mode: The Method Of Communication, Either I2C or SRL
+mode: The Method Of Communication, Either I2C or SRL\
 Returns: Nothing
 
 
@@ -70,5 +70,5 @@ Returns: Nothing
 Place The Controller Into Standby
 
 
-mode: The Method Of Communication, Either I2C or SRL
+mode: The Method Of Communication, Either I2C or SRL\
 Returns: Nothing
