@@ -31,7 +31,7 @@ An example sketch has been provided in Example/Example.ino.
 
 ## VNH5019_Controller Methods
 
-#### mount()
+### mount()
 Open I2C and Serial Ports For Writing To The Controller; Called In setup()
 
 
