@@ -10,8 +10,10 @@
 #define BAUDRATE 115200
 
 /* Assorted Min and Max Values */
-#define VALUE_MIN -100
-#define VALUE_MAX 100
+#define SPEED_MIN -100
+#define SPEED_MAX 100
+#define BRAKE_MIN -100
+#define BRAKE_MAX 100
 #define DRIVER_MAX 400
 #define BYTE_MAX 255
 
@@ -41,15 +43,6 @@ enum Commands {
     BRAKE_BOTH_CHANNELS = ((CHANNEL_1 | CHANNEL_2) | BRAKE),
     MIXED_COMMAND = MIXED,
     TOGGLE_STATE_COMMAND = TOGGLE_STATE,
-};
-
-/* Error Codes */
-enum Error {
-    COMMAND_RECEIVED,
-    INVALID_COMMAND,
-    CHANNEL_1_ERROR,
-    CHANNEL_2_ERROR,
-    FATAL_ERROR,
 };
 
 /* Motor Driver State */

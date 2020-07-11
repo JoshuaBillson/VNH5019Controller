@@ -17,10 +17,11 @@
  * straight ahead.
  */
 
-#include "DualVNH5019MotorShield.h"
-#include "Commands.h"
-#include "Notes.h"
-#include <Wire.h>
+#include <Arduino.h> /* Standard Arduino Library */
+#include "DualVNH5019MotorShield.h" /* Functions for Controlling the Dual VNH5019 Motor Shield  */
+#include "Commands.h" /* Instruction Set & Useful Constants For Serial Interface With Controller */
+#include "Notes.h" /* Macros Defining Musical Notes & Their Corresponding Frequencies */
+#include <Wire.h> /* Functions For Interfacing With I2C Port */
 
 #define LED_PIN 5
 #define BUZZER_PIN 13
@@ -31,21 +32,26 @@
  */
 #define TIMEOUT 15000 /* Length Of Time In Milliseconds */
 
+/* Stores The Time At Which Last Instruction Was Received */
 volatile uint64_t lastInstruction = 0;
 
+/* Globals For Controlling The State (Active or Standby) of the Controller */
 volatile byte state = STANDBY;
 volatile bool toggleActive = false;
 volatile bool toggleStandby = false;
 
+/* Speeds For Each Motor Are Stored Here And Set In The Main Program Loop */
 volatile int motorOneSpeed = 0;
 volatile int motorTwoSpeed = 0;
 
+/* Braking Values For Each Motor Are Stored Here And Set In The Main Program Loop */
 volatile int motorOneBrake = 0;
 volatile int motorTwoBrake = 0;
 
+/* Class For Controlling The Dual VNH5019 Motor Shield */
 DualVNH5019MotorShield motorDriver;
 
-
+/* Setup Procedure */
 void setup() {
   Serial.begin(BAUDRATE);
 
@@ -63,6 +69,7 @@ void setup() {
 }
 
 
+/* Event Loop */
 void loop() {
   while (state == STANDBY) {
     enterStandby();
@@ -85,14 +92,14 @@ void loop() {
 void receiveEvent(int numBytes) {
   lastInstruction = millis();
 
-  byte command = readByte();
+  byte command = readByteI2C();
 
   if (command == MIXED_COMMAND) {
-    int8_t speedVal = readByte();
-    int8_t turnVal = readByte();
+    int8_t speedVal = readByteI2C();
+    int8_t turnVal = readByteI2C();
     handleMixedCommand(speedVal, turnVal);
   } else {
-    int8_t value = readByte();
+    int8_t value = readByteI2C();
     handleStandardCommand(command, value);
   }
 }
@@ -115,42 +122,47 @@ void serialEvent() {
 }
 
 
-/* Receives and Handles a Mixed 3-Byte Command. */
+/* Receives and Handles a Mixed 3-Byte Command. Note That Channel 1 = Left, Channel 2 = Right. */
 void handleMixedCommand(const int8_t speedVal, int8_t turnVal) {
-  motorOneSpeed = speedVal;
-  motorTwoSpeed = speedVal;
+  /* Temp Variables For Motor Speeds Are Used To Optimize For ISR Execution */
+  int8_t speedLeft = speedVal;
+  int8_t speedRight = speedVal;
 
   turnVal *= (speedVal < 0) ? -1 : 1; /* Flip turnVal If Driving In Reverse. */
 
   /* Handle The Case Where Turning Left */
   while (turnVal < 0) {
-    if (motorOneSpeed > VALUE_MIN) {
-      motorOneSpeed--;
+    if (speedLeft > SPEED_MIN) {
+      speedLeft--;
       turnVal++;
     }
 
-    if ((motorTwoSpeed < VALUE_MAX) && (turnVal < 0)) {
-      motorTwoSpeed++;
+    if ((speedRight < SPEED_MAX) && (turnVal != 0)) {
+      speedRight++;
       turnVal++;
     }
   }
 
   /* Handle The Case Where Turning Right */
   while (turnVal > 0) {
-    if (motorOneSpeed < VALUE_MAX) {
-      motorOneSpeed++;
+    if (speedLeft < SPEED_MAX) {
+      speedLeft++;
       turnVal--;
     }
 
-    if ((motorTwoSpeed > VALUE_MIN) && (turnVal > 0)) {
-      motorTwoSpeed--;
+    if ((speedRight > SPEED_MIN) && (turnVal != 0)) {
+      speedRight--;
       turnVal--;
     }
   }
 
+  /* Write Motor Speeds For Driver */
+  motorOneSpeed = speedLeft; /* Motor Channel 1 = Left */
+  motorTwoSpeed = speedRight; /* Motor Channel 2 = Right */
+
   /* Apply Moderate Braking In The Event That Motor Speed Is Zero */
-  motorOneBrake = (motorOneSpeed == 0) ? (VALUE_MAX / 2): 0;
-  motorTwoBrake = (motorTwoSpeed == 0) ? (VALUE_MAX / 2): 0;
+  motorOneBrake = (motorOneSpeed == 0) ? (BRAKE_MAX / 2): 0;
+  motorTwoBrake = (motorTwoSpeed == 0) ? (BRAKE_MAX / 2): 0;
 }
 
 
@@ -208,7 +220,7 @@ void setMotors() {
 
 
 /* Read a Single Byte Over I2C. If No Byte Is Available, Returns A Default of Zero. */
-byte readByte() {
+byte readByteI2C() {
   if (Wire.available()) {
     return Wire.read();
   }
@@ -218,10 +230,10 @@ byte readByte() {
 
 /* Read a Single Byte Over Serial. If No Byte Is Available, Returns A Default of Zero. */
 byte readByteSerial() {
-  if (Serial.available()) {
-    return Serial.read();
-  }
-  return 0;
+    if (Serial.available()) {
+        return Serial.read();
+    }
+    return 0;
 }
 
 
@@ -229,43 +241,63 @@ byte readByteSerial() {
 void pulseLED() {
     static const float period = 2000.0;
     static const float pi = 3.14;
-    float cosine = cos((float(millis()) * pi) / period); /* Repeats Every 2000 Milliseconds. */
+    static uint64_t offset = millis();
+
+    /* When Entering Standby, We Want To Shift The Cosine-Squared Function By The Present Time. */
+    if (toggleStandby) {
+        offset = millis();
+    }
+
+    float cosine = cos((float(millis() - offset) * pi) / period); /* Repeats Every 2000 Milliseconds. */
     float consineSquared = (cosine * cosine);
     byte brightness = consineSquared * float (BYTE_MAX);
     analogWrite(LED_PIN, brightness);
 }
 
 
+/* Play A Musical Note Of A Given Frequency For Some Duration. This Is A Blocking Function */
+void playNote(const uint32_t frequency, const uint32_t duration) {
+    uint64_t interval = (1000000 / frequency) / 2;
+    uint64_t time = millis();
+    while ((millis() - time) < duration) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delayMicroseconds(interval);
+        digitalWrite(BUZZER_PIN, LOW);
+        delayMicroseconds(interval);
+    }
+}
+
+
 /* Play A Power-Up Chime */
 void powerUpChime() {
-    playNote(BUZZER_PIN, A, 100);
-    playNote(BUZZER_PIN, CS, 100);
-    playNote(BUZZER_PIN, E, 250);
+    playNote(A, 100);
+    playNote(C_SHARP, 100);
+    playNote(E, 250);
 }
 
 
 /* Play A Chime Indicating A Transition To An Active State */
 void activeChime() {
-    playNote(BUZZER_PIN, E, 200);
-    playNote(BUZZER_PIN, A, 200);
-    playNote(BUZZER_PIN, CS, 200);
-    playNote(BUZZER_PIN, E, 200);
+    playNote(E, 200);
+    playNote(A, 200);
+    playNote(C_SHARP, 200);
+    playNote(E, 200);
 }
 
 
 /* Play A Chime Indicating A Transition To A Passive State */
 void standbyChime() {
-    playNote(BUZZER_PIN, E, 200);
-    playNote(BUZZER_PIN, A, 200);
+    playNote(E, 200);
+    playNote(A, 200);
 }
 
 
 /* This Procedure Runs When Entering An Active State From A Passive State */
 void enterActive() {
   if (toggleActive) {
-    activeChime();
-    analogWrite(LED_PIN, BYTE_MAX);
     toggleActive = false;
+    analogWrite(LED_PIN, BYTE_MAX);
+    activeChime();
   }
 }
 
@@ -273,6 +305,7 @@ void enterActive() {
 /* This Procedure Runs When Entering A Passive State From An Active State */
 void enterStandby() {
   if (toggleStandby) {
+    pulseLED();
     motorOneSpeed = 0;
     motorTwoSpeed = 0;
     motorDriver.setBrakes(motorOneBrake = DRIVER_MAX, motorTwoBrake = DRIVER_MAX);

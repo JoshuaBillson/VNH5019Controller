@@ -2,10 +2,10 @@
 
 ## Overview
 
-The purpose of this library is to provide a means of controlling a [Dual VNH5019 Motor Driver
-Shield](https://www.pololu.com/product/2507) coupled with an Arduino Uno over either I2C or serial.
-This project uses the standard serial port; to use other hardware serial ports (Serial1, Serial2, etc.)
-or Software Serial requires modification to the source code.
+The purpose of this project is to provide a means of controlling a [Dual VNH5019 Motor Driver
+Shield](https://www.pololu.com/product/2507) coupled with an Arduino Uno from an external device over
+either I2C or serial. This project uses the standard serial port for the receiving Arduino; to use other hardware serial ports
+(Serial1, Serial2, etc.) or Software Serial requires modification to the source code.
 
 
 ## Dependencies
