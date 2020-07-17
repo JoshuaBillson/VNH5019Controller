@@ -24,18 +24,17 @@ class VNH5019_Controller {
     /*
      * Open I2C and Serial Ports For Writing To The Controller; Called In setup()
      * --------------------------------------------------------------------------
-     * Takes No Arguments And Returns Nothing
+     * writeMode: The Method Of Communication, Either I2C or SRL
      */
-    void mount();
+    void mount(WriteMode mode);
 
     /*
      * Write A Speed From -100 (full reverse) to 100 (full forward) To One Or Both Channels
      * ------------------------------------------------------------------------------------
-     * writeMode: The Method Of Communication, Either I2C or SRL
      * channel: The Channel Whose Speed We Want To Set (ONE, TWO, or BOTH)
      * value: The Value We Want To Write
      */
-    void writeSpeed(WriteMode mode, Channels channel, int8_t value);
+    void writeSpeed(Channels channel, int8_t value);
 
     /*
      * Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels
@@ -44,7 +43,7 @@ class VNH5019_Controller {
      * channel: The Channel Whose Brakes We Want To Set (ONE, TWO, or BOTH)
      * value: The Value We Want To Write
      */
-    void writeBrake(WriteMode mode, Channels channel, byte value);
+    void writeBrake(Channels channel, byte value);
 
     /*
      * Write A Mixed Command
@@ -53,30 +52,32 @@ class VNH5019_Controller {
      * speedVal: A Value From -100 (Full Reverse) To 100 (Full Forward)
      * turnVal: A Value From -100 (Full Left) To 100 (Full Right)
      */
-    void writeMixedCommand(WriteMode mode, int8_t speedVal, int8_t turnVal);
+    void writeMixedCommand(int8_t speedVal, int8_t turnVal);
 
     /*
      * Stop Both Motors By Applying Maximum Braking
      * --------------------------------------------
      * writeMode: The Method Of Communication, Either I2C or SRL
      */
-    void stop(WriteMode mode);
+    void stop();
 
     /*
      * Place The Controller Into An Active State
      * -----------------------------------------
      * writeMode: The Method Of Communication, Either I2C or SRL
      */
-    void setActive(WriteMode mode);
+    void setActive();
 
     /*
      * Place The Controller Into Standby
      * ---------------------------------
      * writeMode: The Method Of Communication, Either I2C or SRL
      */
-    void setStandby(WriteMode mode);
+    void setStandby();
 
     private:
+
+    int writeMode;
 
     static void writeI2C(byte* bytes, byte numBytes);
 
