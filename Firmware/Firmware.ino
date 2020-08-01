@@ -15,6 +15,15 @@
  * while the speed byte encodes speed with a value between -100 (full reverse) to 100 (full forward)
  * and the turn byte encodes turning with -100 corresponding to full left, 100 full right, and 0 as
  * straight ahead.
+ *
+ * Recognized Parameters:
+ * Motor Speed: -100 (Full Reverse) to 100 (Full Forward).
+ * Motor Brake: 0 (None) to 100 (Max).
+ * Mixed Speed: -100 (Full Reverse) to 100 (Full Forward).
+ * Mixed Turn: -100 (Max Left) to 100 (Max Right).
+ * Controller State: 0 (Standby) and 1 (Active).
+ *
+ * Note: Channel 1 Corresponds to the Left Motor and Channel 2 Corresponds to the Right Motor.
  */
 
 #include <Arduino.h> /* Standard Arduino Library */
@@ -35,10 +44,8 @@
 /* Stores The Time At Which Last Instruction Was Received */
 volatile uint64_t lastInstruction = 0;
 
-/* Globals For Controlling The State (Active or Standby) of the Controller */
+/* Global For Controlling The State (Active or Standby) of the Controller */
 volatile byte state = STANDBY;
-volatile bool toggleActive = false;
-volatile bool toggleStandby = false;
 
 /* Speeds For Each Motor Are Stored Here And Set In The Main Program Loop */
 volatile int motorOneSpeed = 0;
@@ -51,185 +58,183 @@ volatile int motorTwoBrake = 0;
 /* Class For Controlling The Dual VNH5019 Motor Shield */
 DualVNH5019MotorShield motorDriver;
 
+
 /* Setup Procedure */
 void setup() {
-  Serial.begin(BAUDRATE);
+    /* Initialize Motor Driver and Check For Faults */
+    motorDriver.init();
+    stopIfFault();
+    motorDriver.setBrakes(DRIVER_MAX, DRIVER_MAX);
 
-  motorDriver.init();
-  stopIfFault();
+    /* Initialize Communications */
+    Serial.begin(BAUDRATE);
+    Wire.begin(CONTROLLER_ADDRESS);
+    Wire.onReceive(receiveEvent);
 
-  Wire.begin(CONTROLLER_ADDRESS);
-  Wire.onReceive(receiveEvent);
+    /* Initialize LED and Buzzer Pins */
+    pinMode(LED_PIN, OUTPUT);
+    pinMode(BUZZER_PIN, OUTPUT);
 
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUZZER_PIN, OUTPUT);
-
-  analogWrite(LED_PIN, BYTE_MAX);
-  powerUpChime();
+    /* Turn On LED and Play Power Up Chime */
+    analogWrite(LED_PIN, BYTE_MAX);
+    powerUpChime();
 }
 
 
 /* Event Loop */
 void loop() {
-  while (state == STANDBY) {
-    enterStandby();
-    pulseLED();
-  }
-
-  while (state == ACTIVE) {
-    if ((millis() - lastInstruction) > TIMEOUT) {
-      state = STANDBY;
-      toggleStandby = true;
-    } else {
-      enterActive();
-      setMotors();
+    toggleState();
+    if (state == STANDBY) {
+        pulseLED(false);
     }
-  }
+    else if (state == ACTIVE) {
+        setMotors();
+    }
 }
 
 
 /* This Function Is Called Whenever A Transmission Is Received On I2C. */
 void receiveEvent(int numBytes) {
-  lastInstruction = millis();
-
-  byte command = readByteI2C();
-
-  if (command == MIXED_COMMAND) {
-    int8_t speedVal = readByteI2C();
-    int8_t turnVal = readByteI2C();
-    handleMixedCommand(speedVal, turnVal);
-  } else {
-    int8_t value = readByteI2C();
-    handleStandardCommand(command, value);
-  }
+    lastInstruction = millis();
+    byte command = readByteI2C();
+    if (command == MIXED_COMMAND) {
+        int8_t speedVal = readByteI2C();
+        int8_t turnVal = readByteI2C();
+        handleMixedCommand(speedVal, turnVal);
+    }
+    else {
+        int8_t value = readByteI2C();
+        handleStandardCommand(command, value);
+    }
 }
 
 
 /* This Function Is Called Whenever A Transmission Is Received Over Serial. */
 void serialEvent() {
-  lastInstruction = millis();
-
-  byte command = readByteSerial();
-
-  if (command == MIXED_COMMAND) {
-    int8_t speedVal = readByteSerial();
-    int8_t turnVal = readByteSerial();
-    handleMixedCommand(speedVal, turnVal);
-  } else {
-    int8_t value = readByteSerial();
-    handleStandardCommand(command, value);
-  }
+    lastInstruction = millis();
+    byte command = readByteSerial();
+    if (command == MIXED_COMMAND) {
+        int8_t speedVal = readByteSerial();
+        int8_t turnVal = readByteSerial();
+        handleMixedCommand(speedVal, turnVal);
+    }
+    else {
+        int8_t value = readByteSerial();
+        handleStandardCommand(command, value);
+    }
 }
 
 
 /* Receives and Handles a Mixed 3-Byte Command. Note That Channel 1 = Left, Channel 2 = Right. */
 void handleMixedCommand(const int8_t speedVal, int8_t turnVal) {
-  /* Temp Variables For Motor Speeds Are Used To Optimize For ISR Execution */
-  int8_t speedLeft = speedVal;
-  int8_t speedRight = speedVal;
+    /* Temp Variables For Motor Speeds Are Used To Optimize For ISR Execution */
+    int8_t speedLeft = speedVal;
+    int8_t speedRight = speedVal;
 
-  turnVal *= (speedVal < 0) ? -1 : 1; /* Flip turnVal If Driving In Reverse. */
+    /* Flip turnVal If Driving In Reverse. */
+    turnVal *= (speedVal < 0) ? -1 : 1;
 
-  /* Handle The Case Where Turning Left */
-  while (turnVal < 0) {
-    if (speedLeft > SPEED_MIN) {
-      speedLeft--;
-      turnVal++;
+    /* Handle The Case Where Turning Left */
+    while (turnVal < 0) {
+        if (speedLeft > SPEED_MIN) {
+            speedLeft--;
+            turnVal++;
+        }
+        if ((speedRight < SPEED_MAX) && (turnVal != 0)) {
+            speedRight++;
+            turnVal++;
+        }
     }
 
-    if ((speedRight < SPEED_MAX) && (turnVal != 0)) {
-      speedRight++;
-      turnVal++;
+    /* Handle The Case Where Turning Right */
+    while (turnVal > 0) {
+        if (speedLeft < SPEED_MAX) {
+            speedLeft++;
+            turnVal--;
+        }
+        if ((speedRight > SPEED_MIN) && (turnVal != 0)) {
+            speedRight--;
+            turnVal--;
+        }
     }
-  }
 
-  /* Handle The Case Where Turning Right */
-  while (turnVal > 0) {
-    if (speedLeft < SPEED_MAX) {
-      speedLeft++;
-      turnVal--;
-    }
+    /* Write Motor Speeds For Driver */
+    motorOneSpeed = speedLeft;
+    motorTwoSpeed = speedRight;
 
-    if ((speedRight > SPEED_MIN) && (turnVal != 0)) {
-      speedRight--;
-      turnVal--;
-    }
-  }
-
-  /* Write Motor Speeds For Driver */
-  motorOneSpeed = speedLeft; /* Motor Channel 1 = Left */
-  motorTwoSpeed = speedRight; /* Motor Channel 2 = Right */
-
-  /* Apply Moderate Braking In The Event That Motor Speed Is Zero */
-  motorOneBrake = (motorOneSpeed == 0) ? (BRAKE_MAX / 2): 0;
-  motorTwoBrake = (motorTwoSpeed == 0) ? (BRAKE_MAX / 2): 0;
+    /* Apply Moderate Braking In The Event That Motor Speed Is Zero */
+    motorOneBrake = (motorOneSpeed == 0) ? (BRAKE_MAX / 2): 0;
+    motorTwoBrake = (motorTwoSpeed == 0) ? (BRAKE_MAX / 2): 0;
 }
 
 
 /* Receives and Handles a Standard 2-Byte Command. */
 void handleStandardCommand(const byte command, const int8_t value) {
-  /* Set Driver State To Either Active Or Standby. */
-  if (command == TOGGLE_STATE_COMMAND) {
-    toggleActive = (state == STANDBY && value == ACTIVE) ? true : false;
-    toggleStandby = (state == ACTIVE && value == STANDBY) ? true : false;
-    state = value;
-  }
-
-  /* Note: Setting Speed Overrides Braking and Vice-Versa. */
-
-  /* Set Brake or Speed For Channel 1 */
-  if (bitRead(command, CHANNEL_1_BIT) && state == ACTIVE) {
-    if (bitRead(command, SPEED_BIT)) {
-      motorOneSpeed = value;
-      motorOneBrake = 0;
-    } else if (bitRead(command, BRAKE_BIT)) {
-      motorOneBrake = value;
-      motorOneSpeed = 0;
+    /* Set Driver State To Either Active Or Standby. */
+    if (command == TOGGLE_STATE_COMMAND) {
+        state = value;
     }
-  }
 
-  /* Set Brake or Speed For Channel 2 */
-  if (bitRead(command, CHANNEL_2_BIT) && state == ACTIVE) {
-    if (bitRead(command, SPEED_BIT)) {
-      motorTwoSpeed = value;
-      motorTwoBrake = 0;
-    } else if (bitRead(command, BRAKE_BIT)) {
-      motorTwoBrake = value;
-      motorTwoSpeed = 0;
+    /* Note: Setting Speed Overrides Braking and Vice-Versa. */
+
+    /* Set Brake or Speed For Channel 1 */
+    if (bitRead(command, CHANNEL_1_BIT) && state == ACTIVE) {
+        if (bitRead(command, SPEED_BIT)) {
+            motorOneSpeed = value;
+            motorOneBrake = 0;
+        }
+        else if (bitRead(command, BRAKE_BIT)) {
+            motorOneBrake = value;
+            motorOneSpeed = 0;
+        }
     }
-  }
+
+    /* Set Brake or Speed For Channel 2 */
+    if (bitRead(command, CHANNEL_2_BIT) && state == ACTIVE) {
+        if (bitRead(command, SPEED_BIT)) {
+            motorTwoSpeed = value;
+            motorTwoBrake = 0;
+        }
+        else if (bitRead(command, BRAKE_BIT)) {
+            motorTwoBrake = value;
+            motorTwoSpeed = 0;
+        }
+    }
 }
 
 
 /* Execute Braking Or Speed Control Parameters Via Calls To motorDriver */
 void setMotors() {
-  /* Motor One */
-  if (motorOneBrake != 0) {
-    motorDriver.setM1Brake(motorOneBrake * 4);
-  } else {
-    motorDriver.setM1Speed(motorOneSpeed * 4);
-  }
+    /* Motor One */
+    if (motorOneBrake != 0) {
+        motorDriver.setM1Brake(motorOneBrake * 4);
+    }
+    else {
+        motorDriver.setM1Speed(motorOneSpeed * 4);
+    }
 
-  /* Motor Two */
-  if (motorTwoBrake != 0) {
-    motorDriver.setM2Brake(motorTwoBrake * 4);
-  } else {
-    motorDriver.setM2Speed(motorTwoSpeed * 4);
-  }
+    /* Motor Two */
+    if (motorTwoBrake != 0) {
+        motorDriver.setM2Brake(motorTwoBrake * 4);
+    }
+    else {
+        motorDriver.setM2Speed(motorTwoSpeed * 4);
+    }
 }
 
 
 /* Read a Single Byte Over I2C. If No Byte Is Available, Returns A Default of Zero. */
 byte readByteI2C() {
-  if (Wire.available()) {
-    return Wire.read();
-  }
-  return 0;
+    if (Wire.available()) {
+        return Wire.read();
+    }
+    return 0;
 }
 
 
 /* Read a Single Byte Over Serial. If No Byte Is Available, Returns A Default of Zero. */
 byte readByteSerial() {
+    waitForNextByte(); // Note: I Had Issues Reading Consecutive Bytes Over Serial Without This.
     if (Serial.available()) {
         return Serial.read();
     }
@@ -237,21 +242,78 @@ byte readByteSerial() {
 }
 
 
+/* Waits For The Next Byte To Be Received Over Serial */
+void waitForNextByte() {
+    static const uint64_t timeout = 5;
+    uint64_t time = millis();
+    while (!Serial.available() && (millis() - time) < timeout);
+}
+
+
 /* Regulate The Brightness Of an LED With Respect To Time According To A Cosine-Squared Function. */
-void pulseLED() {
+void pulseLED(const bool reset) {
     static const float period = 2000.0;
     static const float pi = 3.14;
     static uint64_t offset = millis();
 
     /* When Entering Standby, We Want To Shift The Cosine-Squared Function By The Present Time. */
-    if (toggleStandby) {
+    if (reset) {
         offset = millis();
     }
 
-    float cosine = cos((float(millis() - offset) * pi) / period); /* Repeats Every 2000 Milliseconds. */
+    float cosine = cos((float (millis() - offset) * pi) / period); /* Repeats Every 2000 Milliseconds. */
     float consineSquared = (cosine * cosine);
     byte brightness = consineSquared * float (BYTE_MAX);
     analogWrite(LED_PIN, brightness);
+}
+
+
+/* Called Once For Each Iteration Of The Program Loop; Handles Change Of State */
+void toggleState() {
+    /* Static Variable Used To Detect When State Has Changed */
+    static byte previousState = STANDBY;
+
+    /* If Timout, Enter Standby */
+    if ((millis() - lastInstruction) > TIMEOUT) {
+      state = STANDBY;
+    }
+
+    /* If State Has Changed, Take Appropriate Action */
+    if (previousState != state) {
+        previousState = state;
+        if (state == STANDBY) {
+            enterStandby();
+        }
+        else if (state == ACTIVE) {
+            enterActive();
+        }
+    }
+}
+
+
+/* This Procedure Runs When Entering An Active State From A Passive State */
+void enterActive() {
+    analogWrite(LED_PIN, BYTE_MAX);
+    activeChime();
+}
+
+
+/* This Procedure Runs When Entering A Passive State From An Active State */
+void enterStandby() {
+    pulseLED(true);
+    motorOneSpeed = 0;
+    motorTwoSpeed = 0;
+    motorDriver.setBrakes((motorOneBrake = BRAKE_MAX) * 4, (motorTwoBrake = BRAKE_MAX) * 4);
+    standbyChime();
+}
+
+
+/* Halts The Program In The Event Of An Error In Motor One Or Two */
+void stopIfFault() {
+    if (motorDriver.getM1Fault() || motorDriver.getM2Fault()) {
+        Serial.println("Motor Fault!");
+        while(1);
+    }
 }
 
 
@@ -289,36 +351,4 @@ void activeChime() {
 void standbyChime() {
     playNote(E, 200);
     playNote(A, 200);
-}
-
-
-/* This Procedure Runs When Entering An Active State From A Passive State */
-void enterActive() {
-  if (toggleActive) {
-    toggleActive = false;
-    analogWrite(LED_PIN, BYTE_MAX);
-    activeChime();
-  }
-}
-
-
-/* This Procedure Runs When Entering A Passive State From An Active State */
-void enterStandby() {
-  if (toggleStandby) {
-    pulseLED();
-    motorOneSpeed = 0;
-    motorTwoSpeed = 0;
-    motorDriver.setBrakes(motorOneBrake = DRIVER_MAX, motorTwoBrake = DRIVER_MAX);
-    standbyChime();
-    toggleStandby = false;
-  }
-}
-
-
-/* Halts The Program In The Event Of An Error In Motor One Or Two */
-void stopIfFault() {
-  if (motorDriver.getM1Fault() || motorDriver.getM2Fault()) {
-    Serial.println("Motor Fault!");
-    while(1);
-  }
 }

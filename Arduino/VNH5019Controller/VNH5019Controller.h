@@ -16,6 +16,7 @@ enum Channels {
     BOTH
 };
 
+
 /* A Class Representing An Arduino Uno Equipped With A Dual VNH5019 Motor Shield */
 class VNH5019_Controller {
 
