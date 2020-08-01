@@ -1,3 +1,8 @@
+"""
+This file defines constants needed to facilitate communication with the motor controller. Recognized commands,
+bit indices, and values are defined here.
+"""
+
 # I2C Address
 CONTROLLER_ADDRESS = 0x1
 

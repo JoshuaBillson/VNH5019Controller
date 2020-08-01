@@ -1,18 +1,21 @@
-from VNH5019Controller import Controller
+"""
+An example program utilizing the Controller class to write both standard and mixed commands over USB Serial.
+"""
+import VNH5019Controller
 from time import sleep
 from sys import argv
 
 assert len(argv) > 1, "Error: Serial Port Must Be Specified!"
 assert len(argv) < 3, "Error: Too Many Arguments Passed!"
 
-controller = Controller.VNH5019Controller()
+controller = VNH5019Controller.Controller()
 
 
 def setup():
     print("Setting Up...")
-    Controller.init_serial(argv[1])
+    VNH5019Controller.init_serial(argv[1])
     sleep(5)
-    Controller.write_serial(controller.set_active())
+    controller.set_active()
     sleep(2)
     print("Ready!")
 
@@ -20,54 +23,54 @@ def setup():
 def loop():
     # Drive Forward
     print("Forward")
-    controller.write_speed(Controller.BOTH, 100, Controller.write_serial)
+    controller.write_speed(VNH5019Controller.BOTH, 100)
     sleep(1)
-    Controller.write_serial(controller.stop())
+    controller.stop()
     sleep(1)
 
     # Drive Backward
     print("Backward")
-    controller.write_speed(Controller.BOTH, -100, Controller.write_serial)
+    controller.write_speed(VNH5019Controller.BOTH, -100)
     sleep(1)
-    controller.stop(Controller.write_serial)
+    controller.stop()
     sleep(1)
 
     # Turn Left Forward
     print("Forward Left")
-    controller.write_mixed_command(100, -50, Controller.write_serial)
+    controller.write_mixed_command(100, -50)
     sleep(1)
-    controller.stop(Controller.write_serial)
+    controller.stop()
     sleep(1)
 
     # Turn Right Forward
     print("Forward Right")
-    controller.write_mixed_command(100, 50, Controller.write_serial)
+    controller.write_mixed_command(100, 50)
     sleep(1)
-    controller.stop(Controller.write_serial)
+    controller.stop()
     sleep(1)
 
     # Turn Left Backward
     print("Backward Left")
-    controller.write_mixed_command(-100, -50, Controller.write_serial)
+    controller.write_mixed_command(-100, -50)
     sleep(1)
-    controller.stop(Controller.write_serial)
+    controller.stop()
     sleep(1)
 
     # Turn Right Backward
     print("Backward Right")
-    controller.write_mixed_command(-100, 50, Controller.write_serial)
+    controller.write_mixed_command(-100, 50)
     sleep(1)
-    controller.stop(Controller.write_serial)
+    controller.stop()
     sleep(1)
 
     # Enter Standby
     print("Entering Standby...")
-    controller.set_standby(Controller.write_serial)
+    controller.set_standby()
     sleep(5)
 
     # Enter Active
     print("Entering Active...")
-    controller.set_active(Controller.write_serial)
+    controller.set_active()
     sleep(2)
 
 
