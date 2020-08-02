@@ -1,4 +1,8 @@
 # VNH5019Controller Python Library
+This library provides the Controller class to generate valid messages and communicate with the 
+motor controller via either I2C or USB. Before any commands can be sent, the functions **init_serial()**
+or **init_i2c()** must be called. The constants **CHANNEL_1**, **CHANNEL_2**, and **BOTH** are passed to
+**Controller.write_speed()** and **Controller.write_brake()** to select the appropriate channel.
 
 ## Classes:
 **Controller**  

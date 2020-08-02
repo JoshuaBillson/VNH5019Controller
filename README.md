@@ -1,58 +1,41 @@
-# VNH5019 Controller
+# Open Source VNH5019 Motor Controller
 
-## Overview
+## Summary
+The purpose of this project is to create an I2C and USB enabled motor controller powered by a [Dual VNH5019 Motor Driver
+Shield](https://www.pololu.com/product/2507) coupled with an Arduino Uno. The project aims to provide firmware for the Arduino
+Uno as well as C++ and Python libraries for interfacing from an external device.
 
-The purpose of this project is to provide a means of controlling a [Dual VNH5019 Motor Driver
-Shield](https://www.pololu.com/product/2507) coupled with an Arduino Uno from an external device over
-either I2C or serial. This project uses the standard serial port for the receiving Arduino; to use other hardware serial ports
-(Serial1, Serial2, etc.) or Software Serial requires modification to the source code.
+## Features
+The motor controller can be switched between two primary states: standby and active. In standby, the controller will not
+write any commands to the connected motors. As a safety feature, the controller powers up into standby mode and must be 
+instructed to switch to an active state before it will respond to any motor-related directives. In addition, an LED and 
+piezo buzzer may be connected to pins 5 and 13 respectively to provide audio-visual confirmation regarding its state. The
+Arduino receiver will listen over both I2C and USB Serial for commands and will respond to either without placing any 
+expectations on the transmitting device.
 
+## Firmware
+The software for the Arduino Uno controller is included in the Firmware directory. It requires the user to install the
+[DualVNH5019MotorShield library](https://github.com/pololu/dual-vnh5019-motor-shield) in their Arduino/libraries folder
+in order to run. Once this pre-requisite is met, put the Firmware folder into your sketches directory and upload it as usual.
 
-## Dependencies
+## Arduino Library
+The Arduino library for interfacing with the controller from an external Arduino is provided in the Arduino folder. Simply 
+save the Arduino/VNH5019Controller folder to your Arduino/libraries directory and include it in your sketches with **#include 
+VNH5019Controller.h**. Refer to the Arduino README and the provided example sketch for more info.
 
-This project makes use of the [DualVNH5019MotorShield library](https://github.com/pololu/dual-vnh5019-motor-shield)
-for the firmware running on the Uno Controller and must be installed to you Arduino/libraries
-folder.
-
+## Python Library
+A [Python library](https://pypi.org/project/VNH5019-Serial-Controller/) for interfacing with the controller from an external 
+device has been provided and is hosted on the Python Package Index. Simply **pip install VNH5019-Serial-Controller** to make
+use of it. Documentation as well as an example sketch has been provided in the Python folder.
 
 ## Audio-Visual Feedback And Wiring
-
-LED and Audio feedback denoting the state of the controller has been included in the firmware. When
+LED and Audio feedback denoting the state of the controller is included in the firmware. When
 the controller first powers up, a start-up chime will play and an LED will light up. Whilst the controller
-is in standby, the LED will blink at regular 2 second intervals and will be solid when the controller
-is active. Additionally, a unique chime will play when the controller enters a standby state and when
-it enters an active state. Use of this feature is optional, but please be aware that the led is controlled
-by digital pin 5 and the piezo buzzer is controlled by digital pin 13. Please refer to "VNH5019_Controller_Schematic.pdf"
-for further wiring information.
-
-
-## Usage
-
-In order to control the Arduino Uno / VNH5019 Motor Driver Shield from an external device, the corresponding
-firmware found in Firmware/Firmware.ino must be uploaded to the receiving Arduino. In theory, any programmable
-device capable of communicating with an Arduino over I2C or Serial should be capable of interfacing with
-this motor controller. However, this project was designed with other Arduinos, Raspberry Pis, and NVIDIA
-Jetson's in mind. Should you need to extend this project to unsupported devices, the complete set of
-recognized codes used to control the Arduino Uno / VNH5019 Motor Controller is included in "Commands.h".
-To interface with the motor controller over either serial or I2C from an external device, use the
-VNH5019_Controller class and associated methods.
-
-
-## Arduino
-
-To interface with the motor controller from an Arduino compatible board, use the Arduino/VNH5019Controller
-library. An example sketch has been provided in ArduinoExample/ArduinoExample.ino. You can use both I2C
-and Serial, however I2C is likely the preferred option for interfacing two Arduinos. Please note that
-Serial1, Serial2, etc. and SoftwareSerial is not supported.
-
-
-## Raspberry Pi / NVIDIA Jetson
-
-To interface with the motor controller from a Raspberry Pi or NVIDIA Jetson, use the Python/VNH5019Controller
-library. You can use both I2C and Serial, however USB serial is likely the simplest option as it allows
-you to provide both power and communication to the controller over a single wire. An example sketch has
-been provided in PythonExample/PythonExample.py.
-
+is in standby, the LED will blink at regular 2 second intervals but will change to a solid light when the controller
+is in an active state. Additionally, a unique chime will play when the controller enters a standby state and when
+it enters an active state. Use of this feature is optional, but be aware that the led is controlled
+by digital pin 5 and the piezo buzzer is controlled by digital pin 13. Refer to **VNH5019_Controller_Schematic.pdf**
+for further wiring details.
 
 ## Classes
 

@@ -9,11 +9,11 @@ setup(
     version="0.0.0",
     author="Joshua Billson",
     author_email="jmbillson@outlook.com",
-    description="A library for controlling a Pololu VNH5019 Motor Controller Shield via USB Serial",
+    description="A library for controlling a Pololu VNH5019 Motor Controller Shield via USB Serial and I2C.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/JoshuaBillson/VNH5019Controller",
-    packages=["flappy_bird", "src"],
+    packages=["VNH5019Controller"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
