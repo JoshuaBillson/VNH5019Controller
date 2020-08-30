@@ -43,7 +43,9 @@ A pre-existing I2C bus if it exists.
 
 Type: `None`  
 
-### Controller.write_speed(channel, value)
+# Controller Methods
+
+### write_speed( channel, value )
 
 Write a speed value between -100 (full reverse) to 100 (full forward) to one or both channels.  
 
@@ -65,11 +67,25 @@ Type: `bytes`
 
 The bytes to be written to the controller.  
 
- **Controller.write_brake(channel, value)**
+### write_brake( channel, value )
+
 Write a brake value between 0 (coast) to 100 (max brake) to one or both channels.  
-channel (int): The channel whose speed we want to set. Must be one of CHANNEL_1, CHANNEL_2, or BOTH.  
-value (int): The brake we want to set between 0 to 100.  
-Returns (bytes): The bytes to be written to the controller.  
+
+##### channel
+
+Type: `int`  
+
+The channel whose speed we want to set. Must be one of CHANNEL_1, CHANNEL_2, or BOTH.  
+
+##### value
+
+Type: `int`  
+
+The brake we want to set between 0 to 100.  
+
+##### Returns
+
+Type: `None`  
 
 **Controller.write_mixed_command(speed_val, turn_val)**
 Write a mixed command to the motor controller.  
