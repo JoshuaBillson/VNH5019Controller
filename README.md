@@ -26,7 +26,8 @@ VNH5019Controller.h**. Refer to the Arduino README and the provided example sket
 ## Python Library
 A [Python library](https://pypi.org/project/VNH5019-Serial-Controller/) for interfacing with the controller from an external 
 device has been provided and is hosted on the Python Package Index. Simply **pip install VNH5019-Serial-Controller** to make
-use of it. Documentation as well as an example sketch has been provided in the Python folder.
+use of it. [Documentation](https://github.com/JoshuaBillson/VNH5019Controller/tree/master/Python) as well as an example sketch 
+has been provided in the Python folder.
 
 ## Audio-Visual Feedback And Wiring
 LED and Audio feedback denoting the state of the controller is included in the firmware. When
