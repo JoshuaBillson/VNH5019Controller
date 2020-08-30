@@ -8,7 +8,7 @@ from serial import Serial
 try:
     from smbus2 import SMBus
 except ImportError:
-    print("smbus2 Not Installed. Couldn't Configure I2C.")
+    pass
 
 # Enumeration For Writing Standard Commands
 CHANNEL_1 = 0
@@ -64,8 +64,6 @@ class Controller:
 
         channel (int): The channel whose speed we want to set. Must be one of CHANNEL_1, CHANNEL_2, or BOTH.
         value (int): The speed we want to set between -100 to 100.
-
-        Returns (bytes): The bytes to be written to the controller.
         """
         global ser, bus
         assert channel == CHANNEL_1 or channel == CHANNEL_2 or channel == BOTH, "Write Error: Invalid Channel!"
@@ -73,7 +71,6 @@ class Controller:
         commands = (Commands.SET_CHANNEL_1_SPEED, Commands.SET_CHANNEL_2_SPEED, Commands.SET_BOTH_CHANNEL_SPEED)
         bytes_to_write = self._to_byte_array((commands[channel], value))
         Controller._write_bytes(bytes_to_write)
-        return bytes_to_write
 
     def write_brake(self, channel, value):
         """
@@ -81,15 +78,12 @@ class Controller:
 
         channel (int): The channel whose speed we want to set. Must be one of CHANNEL_1, CHANNEL_2, or BOTH.
         value (int): The brake we want to set between 0 to 100.
-
-        Returns (bytes): The bytes to be written to the controller.
         """
         assert channel == CHANNEL_1 or channel == CHANNEL_2 or channel == BOTH, "Write Error: Invalid Channel!"
         assert value <= 100, "Write Error: Invalid Value!"
         commands = (Commands.BRAKE_CHANNEL_1, Commands.BRAKE_CHANNEL_2, Commands.BRAKE_BOTH_CHANNELS)
         bytes_to_write = self._to_byte_array((commands[channel], value))
         Controller._write_bytes(bytes_to_write)
-        return bytes_to_write
 
     def write_mixed_command(self, speed_val, turn_val):
         """
@@ -97,44 +91,26 @@ class Controller:
 
         speed_val (int): The speed we want to write between -100 (full reverse) to 100 (full forward).
         turn_val (int): The turn value we want to write between -100 (max left) to 100 (max right).
-
-        Returns (bytes): The bytes to be written to the controller.
         """
         assert -100 <= speed_val <= 100, "Write Error: Invalid Value!"
         assert -100 <= turn_val <= 100, "Write Error: Invalid Value!"
         bytes_to_write = self._to_byte_array((Commands.MIXED_COMMAND, speed_val, turn_val))
         Controller._write_bytes(bytes_to_write)
-        return bytes_to_write
 
     def stop(self):
-        """
-        Stop both motors by applying max brakes.
-
-        Returns (bytes): The bytes to be written to the controller.
-        """
+        """Stop both motors by applying max brakes."""
         bytes_to_write = self._to_byte_array((Commands.BRAKE_BOTH_CHANNELS, 100))
         Controller._write_bytes(bytes_to_write)
-        return bytes_to_write
 
     def set_active(self):
-        """
-        Put the motor controller into an active state.
-
-        Returns (bytes): The bytes to be written to the controller.
-        """
+        """Put the motor controller into an active state."""
         bytes_to_write = self._to_byte_array((Commands.TOGGLE_STATE_COMMAND, Commands.ACTIVE))
         Controller._write_bytes(bytes_to_write)
-        return bytes_to_write
 
     def set_standby(self):
-        """
-        Put the motor controller into standby.
-
-        Returns (bytes): The bytes to be written to the controller.
-        """
+        """Put the motor controller into standby."""
         bytes_to_write = self._to_byte_array((Commands.TOGGLE_STATE_COMMAND, Commands.STANDBY))
         Controller._write_bytes(bytes_to_write)
-        return bytes_to_write
 
     # PRIVATE METHODS - DO NOT TOUCH THESE!
     @staticmethod
