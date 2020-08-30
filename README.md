@@ -37,3 +37,4 @@ is in an active state. Additionally, a unique chime will play when the controlle
 it enters an active state. Use of this feature is optional, but be aware that the led is controlled
 by digital pin 5 and the piezo buzzer is controlled by digital pin 13. Refer to **VNH5019_Controller_Schematic.pdf**
 for further wiring details.
+![Schematic](https://www.flickr.com/photos/187266310@N04/50284192913/sizes/l/)
