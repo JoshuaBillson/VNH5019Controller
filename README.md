@@ -36,5 +36,6 @@ is in standby, the LED will blink at regular 2 second intervals but will change 
 is in an active state. Additionally, a unique chime will play when the controller enters a standby state and when
 it enters an active state. Use of this feature is optional, but be aware that the led is controlled
 by digital pin 5 and the piezo buzzer is controlled by digital pin 13. Refer to **VNH5019_Controller_Schematic.pdf**
-for further wiring details.
+for further wiring details.  
+
 ![Schematic](https://live.staticflickr.com/65535/50284192913_de4fc9436f_b.jpg)
