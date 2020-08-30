@@ -5,20 +5,20 @@ or **init_i2c()** must be called. The constants **CHANNEL_1**, **CHANNEL_2**, an
 **Controller.write_speed()** and **Controller.write_brake()** to select the appropriate channel.
 
 # Classes:
-**Controller**  
+### Controller
 A class for writing to the VNH5019 Motor Controller via either I2C or USB.
 
 # Constants:
-**CHANNEL_1**  
-**CHANNEL_2**  
-**BOTH**  
+#### CHANNEL_1
+#### CHANNEL_2
+#### BOTH
 
 # Functions:
-**init_serial(port_name)**  
+### init_serial(port_name)
 Initialize a serial port for communication with the motor controller.  
 port_name (string): The name of the serial port to communicate over.  
 
-**init_i2c(pre_existing_bus=None)**  
+### init_i2c(pre_existing_bus=None)
 Initialize the serial bus for communication.  
 pre_existing_bus (SMBus): A pre-existing I2C bus if it exists.  
 
