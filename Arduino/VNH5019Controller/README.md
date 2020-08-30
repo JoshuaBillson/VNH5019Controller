@@ -12,7 +12,7 @@ This class provides the methods needed to write to the controller.
 Open either I2C or Serial Ports For Writing To The Controller.  
 ##### mode
 
-Type: `Byte`  
+Type: `WriteMode`  
 
 The Method Of Communication, Either I2C or SRL.  
 
@@ -20,7 +20,7 @@ The Method Of Communication, Either I2C or SRL.
 Write A Speed From -100 (full reverse) to 100 (full forward) To One Or Both Channels.  
 ##### channel: 
 
-Type: `Byte`  
+Type: `Channels`  
 
 The Channel Whose Speed We Want To Set (ONE, TWO, or BOTH).  
 
@@ -34,13 +34,13 @@ The Value We Want To Write From -100 to 100.
 Write A Brake Value From 0 (coast) to 100 (full brake) To One Or Both Channels.  
 ##### channel: 
 
-Type: `Byte`  
+Type: `Channels`  
 
 The Channel Whose Brakes We Want To Set (ONE, TWO, or BOTH).  
 
 ##### value 
 
-Type: `int8_t`  
+Type: `uint8_t`  
 
 The Value We Want To Write From 0 to 100.  
 
