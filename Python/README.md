@@ -63,9 +63,7 @@ The speed we want to set between -100 to 100.
 
 ##### Returns
 
-Type: `bytes`  
-
-The bytes to be written to the controller.  
+Type: `None`  
 
 ### write_brake( channel, value )
 
@@ -87,23 +85,49 @@ The brake we want to set between 0 to 100.
 
 Type: `None`  
 
-**Controller.write_mixed_command(speed_val, turn_val)**
+### write_mixed_command( speed_val, turn_val )
+
 Write a mixed command to the motor controller.  
-speed_val (int): The speed we want to write between -100 (full reverse) to 100 (full forward).  
-turn_val (int): The turn value we want to write between -100 (max left) to 100 (max right).  
-Returns (bytes): The bytes to be written to the controller.  
 
-**Controller.stop()**
+##### speed_val 
+
+Type: `int`  
+
+The speed we want to write between -100 (full reverse) to 100 (full forward).  
+
+##### turn_val 
+
+Type: `int`  
+
+The turn value we want to write between -100 (max left) to 100 (max right).  
+
+##### Returns
+
+Type: `None`  
+
+### stop()
+
 Stop both motors by applying max brakes.  
-Returns (bytes): The bytes to be written to the controller.  
 
-**Controller.set_active()**
+##### Returns
+
+Type: `None`  
+
+### set_active()
+
 Put the motor controller into an active state.  
-Returns (bytes): The bytes to be written to the controller.  
 
-**Controller.set_standby()**
+##### Returns
+
+Type: `None`  
+
+### set_standby()
+
 Put the motor controller into standby.  
-Returns (bytes): The bytes to be written to the controller.  
+
+##### Returns
+
+Type: `None`  
 
 # Example
 ```python
