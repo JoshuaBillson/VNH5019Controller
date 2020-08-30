@@ -19,26 +19,51 @@ A class for writing to the VNH5019 Motor Controller via either I2C or USB.
 
 Initialize a serial port for communication with the motor controller.  
 
-#### port_name 
+##### port_name 
 Type: `string`  
 
 The name of the serial port to communicate over.  
 
-#### Returns
+##### Returns
 Type: `None`  
 
 ### init_i2c( pre_existing_bus=None )
-Initialize the serial bus for communication.  
-#### pre_existing_bus `SMBus`
-A pre-existing I2C bus if it exists.  
-Default: `None`  
-#### Returns `None`
 
-**Controller.write_speed(channel, value)**  
+Initialize the serial bus for communication.  
+
+##### pre_existing_bus
+
+Type: `SMBus`  
+
+Default: `None`  
+
+A pre-existing I2C bus if it exists.  
+
+##### Returns
+
+Type: `None`  
+
+### Controller.write_speed(channel, value)
+
 Write a speed value between -100 (full reverse) to 100 (full forward) to one or both channels.  
-channel (int): The channel whose speed we want to set. Must be one of CHANNEL_1, CHANNEL_2, or BOTH.  
-value (int): The speed we want to set between -100 to 100.  
-Returns (bytes): The bytes to be written to the controller.  
+
+##### channel
+
+Type: `int`  
+
+The channel whose speed we want to set. Must be one of CHANNEL_1, CHANNEL_2, or BOTH.  
+
+##### value
+
+Type: `int`  
+
+The speed we want to set between -100 to 100.  
+
+##### Returns
+
+Type: `bytes`  
+
+The bytes to be written to the controller.  
 
  **Controller.write_brake(channel, value)**
 Write a brake value between 0 (coast) to 100 (max brake) to one or both channels.  
