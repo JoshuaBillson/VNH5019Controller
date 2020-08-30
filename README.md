@@ -19,7 +19,8 @@ in order to run. Once this pre-requisite is met, put the Firmware folder into yo
 # Arduino Library
 The Arduino library for interfacing with the controller from an external Arduino is provided in the Arduino folder. Simply 
 save the Arduino/VNH5019Controller folder to your Arduino/libraries directory and include it in your sketches with **#include 
-VNH5019Controller.h**. Refer to the Arduino README and the provided example sketch for more info.
+VNH5019Controller.h**. [Documentation](https://github.com/JoshuaBillson/VNH5019Controller/tree/master/Arduino/VNH5019Controller) 
+as well as an example sketch has been provided in the Arduino folder.
 
 # Python Library
 A [Python library](https://pypi.org/project/VNH5019-Serial-Controller/) for interfacing with the controller from an external 
