@@ -16,9 +16,9 @@ A class for writing to the VNH5019 Motor Controller via either I2C or USB.
 # Functions:
 ### init_serial( port_name )
 Initialize a serial port for communication with the motor controller.  
-##### port_name
+##### port_name `string`
 The name of the serial port to communicate over.  
-Type: `string`  
+Type: 
 ##### Returns
 Type: `None`
 
