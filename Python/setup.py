@@ -1,12 +1,12 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    install_requires=["pyserial==3.4"],
+    install_requires=["pyserial==3.4", "smbus2==0.3.0"],
     name="VNH5019_Serial_Controller",
-    version="0.0.0",
+    version="0.0.2",
     author="Joshua Billson",
     author_email="jmbillson@outlook.com",
     description="A library for controlling a Pololu VNH5019 Motor Controller Shield via USB Serial and I2C.",
@@ -21,3 +21,4 @@ setup(
     ],
     python_requires=">=3.5",
 )
+
