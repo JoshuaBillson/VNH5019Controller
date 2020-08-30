@@ -1,21 +1,19 @@
 # VNH5019Controller Python Library
-
-## Summary
 This library provides the Controller class to generate valid messages and communicate with the 
 motor controller via either I2C or USB. Before any commands can be sent, the functions **init_serial()**
 or **init_i2c()** must be called. The constants **CHANNEL_1**, **CHANNEL_2**, and **BOTH** are passed to
 **Controller.write_speed()** and **Controller.write_brake()** to select the appropriate channel.
 
-## Classes:
+# Classes:
 **Controller**  
 A class for writing to the VNH5019 Motor Controller via either I2C or USB.
 
-## Constants:
+# Constants:
 **CHANNEL_1**  
 **CHANNEL_2**  
 **BOTH**  
 
-## Functions:
+# Functions:
 **init_serial(port_name)**  
 Initialize a serial port for communication with the motor controller.  
 port_name (string): The name of the serial port to communicate over.  
@@ -53,3 +51,85 @@ Returns (bytes): The bytes to be written to the controller.
 **Controller.set_standby()**
 Put the motor controller into standby.  
 Returns (bytes): The bytes to be written to the controller.  
+
+# Example
+```python
+import VNH5019Controller
+from time import sleep
+from sys import argv
+
+controller = VNH5019Controller.Controller()
+
+
+def setup():
+    print("Setting Up...")
+    VNH5019Controller.init_serial(argv[1])
+    sleep(5)
+    controller.set_active()
+    sleep(2)
+    print("Ready!")
+
+
+def loop():
+    while True:
+        # Drive Forward
+        print("Forward")
+        controller.write_speed(VNH5019Controller.BOTH, 100)
+        sleep(1)
+        controller.stop()
+        sleep(1)
+
+        # Drive Backward
+        print("Backward")
+        controller.write_speed(VNH5019Controller.BOTH, -100)
+        sleep(1)
+        controller.stop()
+        sleep(1)
+
+        # Turn Left Forward
+        print("Forward Left")
+        controller.write_mixed_command(100, -50)
+        sleep(1)
+        controller.stop()
+        sleep(1)
+
+        # Turn Right Forward
+        print("Forward Right")
+        controller.write_mixed_command(100, 50)
+        sleep(1)
+        controller.stop()
+        sleep(1)
+
+        # Turn Left Backward
+        print("Backward Left")
+        controller.write_mixed_command(-100, -50)
+        sleep(1)
+        controller.stop()
+        sleep(1)
+
+        # Turn Right Backward
+        print("Backward Right")
+        controller.write_mixed_command(-100, 50)
+        sleep(1)
+        controller.stop()
+        sleep(1)
+
+        # Enter Standby
+        print("Entering Standby...")
+        controller.set_standby()
+        sleep(5)
+
+        # Enter Active
+        print("Entering Active...")
+        controller.set_active()
+        sleep(2)
+
+
+def main():
+    setup()
+    loop()
+
+
+if __name__ == '__main__':
+    main()
+```
